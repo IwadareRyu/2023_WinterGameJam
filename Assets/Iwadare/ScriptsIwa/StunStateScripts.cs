@@ -22,7 +22,7 @@ public class StunStateScripts : MonoBehaviour
             _time += Time.deltaTime;
         }
 
-        if (_time < _stunTime)
+        if (_time > _stunTime)
         {
             Debug.Log("Normal");
             _time = 0f;
