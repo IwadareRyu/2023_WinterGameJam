@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _speed = 3f;
     [SerializeField] float _boarSpeed = 5f;
     [SerializeField] float _dreamSpeed = 4f;
-    SpeedState _speedState = SpeedState.SpeedNormal;
+    BoarState _speedState = BoarState.Human;
 
 
     Rigidbody2D _rb;
@@ -25,13 +25,13 @@ public class PlayerController : MonoBehaviour
         if (_stunStateScripts.StunState == StunState.Normal)
         {
 
-            if (_speedState == SpeedState.SpeedNormal)
+            if (_speedState == BoarState.Human)
             {
                 //移動
                 _x = Input.GetAxisRaw("Horizontal");
                 _y = Input.GetAxisRaw("Vertical");
-                
-                if(_x != 0 || _y != 0)
+
+                if (_x != 0 || _y != 0)
                 {
                     _tmpx = _x;
                     _tmpy = _y;
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetButtonDown("Skill"))
                 {
-                    DreamStateScriopts.DreamWorld.Invoke();
+                    DreamStateScripts.DreamWorld.Invoke();
                 }// 夢世界
 
             }
@@ -68,13 +68,17 @@ public class PlayerController : MonoBehaviour
             //移動処理
             var horizontal = Vector2.right * _x;
             var vertical = Vector2.up * _y;
-            if (_speedState == SpeedState.SpeedNormal)
+            if (_speedState == BoarState.Human && DreamStateScripts.DreamState == DreamState.Normal)
             {
                 _rb.velocity = horizontal.normalized * _speed + vertical.normalized * _speed;
             }
-            else
+            else if (_speedState == BoarState.Boar)
             {
                 _rb.velocity = horizontal.normalized * _boarSpeed + vertical.normalized * _boarSpeed;
+            }
+            else
+            {
+                _rb.velocity = horizontal.normalized * _dreamSpeed + vertical.normalized * _dreamSpeed;
             }
         }
         else
@@ -83,36 +87,54 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>イノシシモードになるときに呼ばれるメソッド</summary>
     void BoarSpeedUp()
     {
-        _speedState = SpeedState.Boar;
+        _speedState = BoarState.Boar;
         _x = _tmpx;
         _y = _tmpy;
         Debug.Log("Boar");
     }
 
+    /// <summary>Stunするときに呼び出されるメソッド</summary>
     void Stun()
     {
         _stunStateScripts.ChangeStunState();
     }
-
-    enum SpeedState
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        SpeedNormal,
-        Boar,
+        if (collision.gameObject.tag == "Respawn")
+        {
+            if (DreamStateScripts.DreamState == DreamState.Dream)
+            {
+                Debug.Log("ひかりあれ！");
+            }
+            else
+            {
+                Debug.Log("Getだぜ！");
+            }
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(_speedState == SpeedState.Boar)
+        if (_speedState == BoarState.Boar)
         {
             Stun();
             if (collision.gameObject.TryGetComponent<StunStateScripts>(out var stun))
             {
                 stun.ChangeStunState();
             }
-            _speedState = SpeedState.SpeedNormal;
+            _speedState = BoarState.Human;
             Debug.Log("SpeedNormal");
         }
     }
+
+    /// <summary>イノシシモードか否か</summary>
+    enum BoarState
+    {
+        Human,
+        Boar,
+    }
+
 }
