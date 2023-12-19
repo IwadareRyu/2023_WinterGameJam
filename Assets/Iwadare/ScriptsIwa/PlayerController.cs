@@ -6,15 +6,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _speed = 3f;
     [SerializeField] float _boarSpeed = 5f;
     [SerializeField] float _dreamSpeed = 4f;
-    SpeedState _speedState = SpeedState.Normal;
+    SpeedState _speedState = SpeedState.SpeedNormal;
 
 
     Rigidbody2D _rb;
     float _x, _y;
+    float _tmpx, _tmpy;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _tmpy = 1;
     }
 
     // Update is called once per frame
@@ -23,11 +25,17 @@ public class PlayerController : MonoBehaviour
         if (_stunStateScripts.StunState == StunState.Normal)
         {
 
-            if (_speedState == SpeedState.Normal)
+            if (_speedState == SpeedState.SpeedNormal)
             {
                 //à⁄ìÆ
                 _x = Input.GetAxisRaw("Horizontal");
                 _y = Input.GetAxisRaw("Vertical");
+                
+                if(_x != 0 || _y != 0)
+                {
+                    _tmpx = _x;
+                    _tmpy = _y;
+                }
 
                 if (Input.GetButtonDown("Fire1"))
                 {
@@ -55,12 +63,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_stunStateScripts.StunState == StunState.Normal)
+        if (_stunStateScripts.StunState != StunState.Stun)
         {
             //à⁄ìÆèàóù
             var horizontal = Vector2.right * _x;
             var vertical = Vector2.up * _y;
-            if (_speedState == SpeedState.Normal)
+            if (_speedState == SpeedState.SpeedNormal)
             {
                 _rb.velocity = horizontal.normalized * _speed + vertical.normalized * _speed;
             }
@@ -78,13 +86,33 @@ public class PlayerController : MonoBehaviour
     void BoarSpeedUp()
     {
         _speedState = SpeedState.Boar;
-        _x = transform.forward.x;
-        _y = transform.forward.y;
+        _x = _tmpx;
+        _y = _tmpy;
+        Debug.Log("Boar");
+    }
+
+    void Stun()
+    {
+        _stunStateScripts.ChangeStunState();
     }
 
     enum SpeedState
     {
-        Normal,
+        SpeedNormal,
         Boar,
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(_speedState == SpeedState.Boar)
+        {
+            Stun();
+            if (collision.gameObject.TryGetComponent<StunStateScripts>(out var stun))
+            {
+                stun.ChangeStunState();
+            }
+            _speedState = SpeedState.SpeedNormal;
+            Debug.Log("SpeedNormal");
+        }
     }
 }

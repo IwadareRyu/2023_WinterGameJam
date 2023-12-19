@@ -22,8 +22,10 @@ public class StunStateScripts : MonoBehaviour
             _time += Time.deltaTime;
         }
 
-        if (_time == _stunTime)
+        if (_time < _stunTime)
         {
+            Debug.Log("Normal");
+            _time = 0f;
             _stunState = StunState.Normal;
         }
     }
@@ -31,6 +33,7 @@ public class StunStateScripts : MonoBehaviour
     /// <summary>Stunó‘ÔØ‚è‘Ö‚¦</summary>
     public void ChangeStunState()
     {
+        Debug.Log("Stun");
         _stunState = StunState.Stun;
     }
 
