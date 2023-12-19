@@ -83,6 +83,7 @@ public class EnemyMove : MonoBehaviour
 
     private void Patrol()
     {
+        if (_targetPoss.Length <= 0) return;
         // 次の目標地点を取得し、方向を計算して移動
         var currentTargetPos = _targetPoss[_currentTargetIndex % _targetPoss.Length].position;
         Vector2 dir = (currentTargetPos - this.transform.position).normalized;
