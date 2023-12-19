@@ -5,7 +5,7 @@ using UnityEngine;
 public class StunStateScripts : MonoBehaviour
 {
     StunState _stunState;
-    StunState StunState => _stunState;
+    public StunState StunState => _stunState;
     [SerializeField] float _stunTime = 5f;
     float _time;
 
