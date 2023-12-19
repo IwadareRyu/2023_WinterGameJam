@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class DreamStateScriopts : MonoBehaviour
+public class DreamStateScripts : MonoBehaviour
 {
     static DreamState _dreamState;
-    public DreamState DreamState => _dreamState;
-    [SerializeField] float _stunTime = 5f;
+    public static DreamState DreamState => _dreamState;
+    [SerializeField] float _dreamTime = 5f;
     float _time;
+    [Tooltip("夢の始まり")]
     public static UnityAction DreamWorld;
+    [Tooltip("夢の終わり")]
     public static UnityAction DreamWorldEnd;
     // Start is called before the first frame update
     void Awake()
@@ -37,19 +39,23 @@ public class DreamStateScriopts : MonoBehaviour
             _time += Time.deltaTime;
         }
 
-        if (_time == _stunTime)
+        if (_time > _dreamTime)
         {
-            _dreamState = DreamState.Normal;
+            _time = 0f;
+            DreamWorldEnd.Invoke();
         }
     }
 
+
     void ChangeDream()
     {
+        Debug.Log("Welcome to Dream！");
         _dreamState = DreamState.Dream;
     }
 
     void ChangeDreamNormal()
     {
+        Debug.Log("夢の時間は終わる...");
         _dreamState = DreamState.Normal;
     }
 }
