@@ -6,26 +6,27 @@ public class GManager : MonoBehaviour
 {
     //-------Var-------//
 
-    // 初期タイマー（秒）
-    [SerializeField] private float initialTimer = 300.0f;
-    // タイマーを表示するテキスト
-    [SerializeField] private Text timerText;
-    // 1秒あたりのスコア
-    [SerializeField] private float TimeScore = 100.0f;
-
-    // ジュエル1つあたりのスコア
-    [SerializeField] private int jewelScore = 10000;
-
-    [SerializeField] private AudioSource bgmSource;
-    [SerializeField] private AudioClip bgm;
-
-    [SerializeField] private string titleSceneName;
-    [SerializeField] private string mainSceneName;
-    [SerializeField] private string gameOverSceneName;
+    [Header("累計プレイ時間（減算方式）")] public float initialTimer = 300.0f;
+    [Header("経過時間（加算方式）")] public Text elapsedTimeText;
+    [Header("残り時間表示テキスト")] public Text timerText;
+    [Header("敵と衝突時の残り時間スピードアップ速度")] public float speedUpSpeed = 10.0f;
+    [Header("タイムスコア（１秒につき何点乗算するか）")] public float TimeScore = 100.0f;
+    [Header("ジュエルスコア（１つにつき何点乗算するか）")] public int jewelScore = 10000;
+    [Header("BGMデータ")] public AudioSource bgmSource;
+    [Header("BGMの音量調整")] public AudioClip bgm;
+    [Header("タイトル画面の名前")] public string titleSceneName;
+    [Header("プレイ画面の名前")] public string mainSceneName;
+    [Header("リザルト画面の名前")] public string gameResult;
 
     private int jewelCount = 0;
     private float gameTimer;
+    private float elapsedTime = 0;
     private int score = 0;
+    // 現在スピードアップ中かどうか
+    private bool isSpeedUp = false;
+    // スピードアップの経過時間
+    private float speedUpTimer = 0; 
+
 
     //-----Single-----//
 
@@ -49,18 +50,51 @@ public class GManager : MonoBehaviour
         ResetTimer();
     }
 
-    // タイマーの更新
     void Update()
     {
         if (SceneManager.GetActiveScene().name == mainSceneName)
         {
-            gameTimer -= Time.deltaTime;
-            timerText.text = "Time: " + gameTimer.ToString("F2");
+            // 残り時間の更新
+            float deltaTime = Time.deltaTime;
+
+            if (isSpeedUp)
+            {
+                // x倍の速さで減少
+                gameTimer -= deltaTime * speedUpSpeed;
+
+                speedUpTimer += deltaTime * speedUpSpeed;
+
+                // x秒経過したら元のスピードに戻す
+                if (speedUpTimer >= speedUpSpeed)
+                {
+                    isSpeedUp = false;
+                }
+            }
+            else
+            {
+                gameTimer -= deltaTime;
+            }
+                timerText.text = "Time: " + gameTimer.ToString("F2");
 
             if (gameTimer <= 0)
             {
-                CalculateScore(); // スコアの計算
-                SceneManager.LoadScene(gameOverSceneName);
+                CalculateScore();
+                SceneManager.LoadScene(gameResult);
+            }
+
+            // 経過時間の更新
+            if (isSpeedUp)
+            {
+                elapsedTime += Time.deltaTime * speedUpSpeed;
+            }
+            else
+            { 
+                elapsedTime += Time.deltaTime;
+            }
+
+            if (elapsedTimeText != null)
+            {
+                elapsedTimeText.text = "Elapsed Time: " + elapsedTime.ToString("F2");
             }
         }
     }
@@ -74,6 +108,7 @@ public class GManager : MonoBehaviour
 
     //------Jewel------//
 
+    // ジュエルの数を増やす（ジュエルを取った時に呼ぶ）
     public void AddJewelCount()
     {
         jewelCount++;
@@ -86,7 +121,7 @@ public class GManager : MonoBehaviour
 
     //------Score-----//
 
-    // スコアの計算
+    // スコアの計算をする
     public void CalculateScore()
     {
         score = jewelCount * jewelScore - (int)(gameTimer * TimeScore);
@@ -115,6 +150,14 @@ public class GManager : MonoBehaviour
         return gameTimer;
     }
 
+    // 敵との衝突した時に呼ぶ
+    public void clashEnemy()
+    {
+       // スピードアップを開始
+       isSpeedUp = true; 
+       speedUpTimer = 0;
+    }
+
     //-------BGM-------//
 
     public void PlayBGM(AudioClip bgm)
@@ -126,7 +169,6 @@ public class GManager : MonoBehaviour
             bgmSource.loop = true;
         }
     }
-
     public void StopBGM()
     {
         if (bgmSource != null)
@@ -145,13 +187,6 @@ public class GManager : MonoBehaviour
 
     public float GetBGMVolume()
     {
-        if (bgmSource != null)
-        {
-            return bgmSource.volume;
-        }
-        else
-        {
-            return 0;
-        }
+        return bgmSource != null ? bgmSource.volume : 0;
     }
 }
