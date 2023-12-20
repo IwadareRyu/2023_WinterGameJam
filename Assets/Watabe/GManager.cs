@@ -16,7 +16,7 @@ public class GManager : MonoBehaviour
     [Header("BGMの音量調整")] public AudioClip bgm;
     [Header("タイトル画面の名前")] public string titleSceneName;
     [Header("プレイ画面の名前")] public string mainSceneName;
-    [Header("リザルト画面の名前")] public string gameResult;
+    [Header("リザルト画面の名前")] public string resultSceneName;
 
     private int jewelCount = 0;
     private float gameTimer;
@@ -79,7 +79,7 @@ public class GManager : MonoBehaviour
             if (gameTimer <= 0)
             {
                 CalculateScore();
-                SceneManager.LoadScene(gameResult);
+                SceneManager.LoadScene(resultSceneName);
             }
 
             // 経過時間の更新
