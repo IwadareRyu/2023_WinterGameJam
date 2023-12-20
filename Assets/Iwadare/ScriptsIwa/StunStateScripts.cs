@@ -6,14 +6,14 @@ public class StunStateScripts : MonoBehaviour
     StunState _stunState;
     public StunState StunState => _stunState;
     [SerializeField] float _stunTime = 5f;
+    [SerializeField] Transform _spriteTrans;
     float _time;
-    Animator _anim;
+    [SerializeField] Animator _anim;
 
     // Start is called before the first frame update
     private void Awake()
     {
         _stunState = StunState.Normal;
-        _anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -37,10 +37,10 @@ public class StunStateScripts : MonoBehaviour
         Debug.Log("ドカーン！");
         var tmpScale = transform.localScale;
         var expSeq = DOTween.Sequence();
-        expSeq.Append(transform.DOScale(tmpScale * 3f, _stunTime / 2f / 4f))
-            .Append(transform.DOScale(tmpScale, _stunTime / 2f / 2f))
-            .Append(transform.DOScale(tmpScale * 1.5f, _stunTime / 2f / 8f))
-            .Append(transform.DOScale(tmpScale, _stunTime / 2f / 8f));
+        expSeq.Append(_spriteTrans.DOScale(tmpScale * 3f, _stunTime / 2f / 4f))
+            .Append(_spriteTrans.DOScale(tmpScale, _stunTime / 2f / 2f))
+            .Append(_spriteTrans.DOScale(tmpScale * 1.5f, _stunTime / 2f / 8f))
+            .Append(_spriteTrans.DOScale(tmpScale, _stunTime / 2f / 8f));
         expSeq.Play().SetLink(gameObject);
     }
 

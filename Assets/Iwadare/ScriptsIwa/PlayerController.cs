@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Cracker _crakerPrefab;
     [SerializeField] CrackerItem _crakerItem;
     [SerializeField] BomItem _bomItem;
-    Animator _anim;
+    [SerializeField] Animator _anim;
     bool _isWalk;
     bool _bearBool;
     bool _actionBool;
@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
         _tmpy = 1;
     }
 
