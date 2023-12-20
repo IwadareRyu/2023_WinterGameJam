@@ -138,6 +138,15 @@ public class GManager : MonoBehaviour
         return score;
     }
 
+    //------Goal-----//
+
+    // ゴールした時に呼ぶ
+    public void Goal()
+    {
+        CalculateScore();
+        SceneManager.LoadScene(resultSceneName);
+    }
+
     //------Time------//
 
     public void ResetTimer()
@@ -150,7 +159,7 @@ public class GManager : MonoBehaviour
         return gameTimer;
     }
 
-    // 敵との衝突した時に呼ぶ
+    // 敵と衝突した時に呼ぶ
     public void clashEnemy()
     {
        // スピードアップを開始
