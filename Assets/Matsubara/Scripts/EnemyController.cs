@@ -37,7 +37,19 @@ public class EnemyController : MonoBehaviour
     private Transform _fov;
 
     [SerializeField]
+    private GameObject _exclamationMark;
+
+    [SerializeField, Tooltip("プレイヤーを見つけたときのSE")]
     private AudioSource _detectedSE;
+
+    [SerializeField, Tooltip("歩いているときのSE")]
+    private AudioSource _walkSE;
+
+    [SerializeField, Tooltip("走っているときのSE")]
+    private AudioSource _splintSE;
+
+    [SerializeField]
+    private Animator _animator;
 
     private RaycastHit2D _hit;
     private int _currentTargetIndex = 0;
@@ -48,9 +60,7 @@ public class EnemyController : MonoBehaviour
     private Coroutine _nowCoroutine;
     private bool _isTimerEnd = false;
 
-
-
-    void Start()
+    private void Awake()
     {
         DreamStateScripts.DreamWorld += OnDreamWorld;
         DreamStateScripts.DreamWorldEnd += OnDreamWorldExit;
@@ -58,7 +68,11 @@ public class EnemyController : MonoBehaviour
         if (TryGetComponent(out Rigidbody2D rb)) _rb = rb;
 
         _defaultPos = transform.position;
+        _exclamationMark.SetActive(false);
+    }
 
+    void Start()
+    {
         if (_isPatrollingGuard) _nowCoroutine = StartCoroutine(Patrol());
         //else _nowCoroutine = StartCoroutine(Search());
 
@@ -78,6 +92,8 @@ public class EnemyController : MonoBehaviour
             if (_stunState.StunState == StunState.Stun)
             {
                 _rb.velocity = Vector3.zero;
+                _walkSE.Stop();
+                _splintSE.Stop();
             }
 
             yield return null;
@@ -88,6 +104,9 @@ public class EnemyController : MonoBehaviour
     {
         if (_targetPoss.Length <= 0) yield break;
 
+        _animator.SetBool("walk", true);
+        _walkSE.Play();
+
         while (!_isStun)
         {
             // 次の目標地点を取得し、方向を計算して移動
@@ -96,7 +115,8 @@ public class EnemyController : MonoBehaviour
             _fov.transform.up = dir * -1;
             _rb.velocity = dir * _walkSpeed;
             var targetDistance = Vector2.Distance(currentTargetPos, this.transform.position);
-
+            _animator.SetFloat("x", dir.x);
+            _animator.SetFloat("y", dir.y);
             // 目標地点に到達したら次の目標地点へ
             if (targetDistance < _stopDistance)
             {
@@ -110,6 +130,10 @@ public class EnemyController : MonoBehaviour
     /// <summary>追跡関数</summary>
     IEnumerator Chase()
     {
+        _walkSE.Stop();
+        _splintSE.Play();
+        _animator.SetBool("walk", true);
+
         while (!_isStun && _playerPos)
         {
             // プレイヤーを追跡する方向を計算して移動
@@ -119,11 +143,14 @@ public class EnemyController : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
+        _exclamationMark.SetActive(false);
     }
 
     /// <summary>プレイヤーを見失ったときの処理を行う関数</summary>
     IEnumerator Return()
     {
+        _splintSE.Stop();
+        _animator.SetBool("walk", false);
         _rb.velocity = Vector2.zero;
         _playerPos = null;
         yield return new WaitForSeconds(1);
@@ -137,6 +164,7 @@ public class EnemyController : MonoBehaviour
         else
         {
             StartCoroutine(Timer());
+            _walkSE.Play();
 
             while (!_isTimerEnd)
             {
@@ -152,6 +180,7 @@ public class EnemyController : MonoBehaviour
                 yield return new WaitForFixedUpdate();
             }
 
+            _walkSE.Stop();
             this.transform.position = _defaultPos;
             yield break;
         }
@@ -195,6 +224,7 @@ public class EnemyController : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             _detectedSE.PlayOneShot(_detectedSE.clip);
+            _exclamationMark.SetActive(true);
             _playerPos = collision.transform;
             if (_nowCoroutine != null) StopCoroutine(_nowCoroutine);
             _nowCoroutine = StartCoroutine(Chase());
