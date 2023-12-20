@@ -27,8 +27,17 @@ public class EnemyController : MonoBehaviour
     [SerializeField, Tooltip("停止距離")]
     private float _stopDistance = 0.5f;
 
-    [SerializeField]
+    [SerializeField, Tooltip("持ち場に強制的に戻されるまでの時間")]
     private float _returnTime = 2f;
+
+    [SerializeField, Tooltip("首の回転速度")]
+    private float _rotateSpeed = 0.5f;
+
+    [SerializeField, Tooltip("視界")]
+    private Transform _fov;
+
+    [SerializeField]
+    private AudioSource _detectedSE;
 
     private RaycastHit2D _hit;
     private int _currentTargetIndex = 0;
@@ -38,6 +47,7 @@ public class EnemyController : MonoBehaviour
     private Transform _playerPos = null;
     private Coroutine _nowCoroutine;
     private bool _isTimerEnd = false;
+
 
 
     void Start()
@@ -50,7 +60,7 @@ public class EnemyController : MonoBehaviour
         _defaultPos = transform.position;
 
         if (_isPatrollingGuard) _nowCoroutine = StartCoroutine(Patrol());
-        else _nowCoroutine = StartCoroutine(Search());
+        //else _nowCoroutine = StartCoroutine(Search());
 
         StartCoroutine(DrawRay());
     }
@@ -83,7 +93,7 @@ public class EnemyController : MonoBehaviour
             // 次の目標地点を取得し、方向を計算して移動
             var currentTargetPos = _targetPoss[_currentTargetIndex % _targetPoss.Length].position;
             Vector2 dir = (currentTargetPos - this.transform.position).normalized;
-            transform.up = dir;
+            _fov.transform.up = dir * -1;
             _rb.velocity = dir * _walkSpeed;
             var targetDistance = Vector2.Distance(currentTargetPos, this.transform.position);
 
@@ -104,7 +114,7 @@ public class EnemyController : MonoBehaviour
         {
             // プレイヤーを追跡する方向を計算して移動
             var dir = (_playerPos.position - this.transform.position).normalized;
-            transform.up = dir;
+            _fov.transform.up = dir * -1;
             _rb.velocity = dir * _sprintSpeed;
             yield return new WaitForFixedUpdate();
         }
@@ -131,7 +141,7 @@ public class EnemyController : MonoBehaviour
             while (!_isTimerEnd)
             {
                 var dir = _defaultPos;
-                transform.up = dir;
+                _fov.transform.up = dir * -1;
                 _rb.velocity = dir * _walkSpeed;
                 var dis = Vector2.Distance(_defaultPos, this.transform.position);
 
@@ -147,16 +157,16 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    IEnumerator Search()
-    {
-        var z = 0;
-        while (true)
-        {
-            this.transform.localEulerAngles = new Vector3(0, 0, z);
-
-            yield return null;
-        }
-    }
+    //IEnumerator Search()
+    //{
+    //    var z = 180f;
+    //    while (true)
+    //    {
+    //        _fov.transform.rotation = new Quaternion(0, 0, z, 1).
+    //        z *= -1;
+    //        yield return new WaitForSeconds(_rotateSpeed);
+    //    }
+    //}
 
     IEnumerator Timer()
     {
@@ -184,6 +194,7 @@ public class EnemyController : MonoBehaviour
         // プレイヤーが検知されたら追跡モードに切り替える
         if (collision.CompareTag("Player"))
         {
+            _detectedSE.PlayOneShot(_detectedSE.clip);
             _playerPos = collision.transform;
             if (_nowCoroutine != null) StopCoroutine(_nowCoroutine);
             _nowCoroutine = StartCoroutine(Chase());
