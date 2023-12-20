@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -12,8 +11,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform _cracerInsPos;
     [SerializeField] Cracker _crakerPrefab;
     [SerializeField] CrackerItem _crakerItem;
+    [SerializeField] BoarInterval _boarInterval;
     [SerializeField] BomItem _bomItem;
     [SerializeField] Animator _anim;
+    AudioSource _audioSource;
+    [SerializeField] AudioClip _audioRun;
     bool _isWalk;
     bool _bearBool;
     bool _actionBool;
@@ -24,7 +26,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
         _tmpy = 1;
+        _audioSource.clip = _audioRun;
     }
 
     // Update is called once per frame
@@ -38,37 +42,45 @@ public class PlayerController : MonoBehaviour
                 //移動
                 _x = Input.GetAxisRaw("Horizontal");
                 _y = Input.GetAxisRaw("Vertical");
-
+                if (!_audioSource.isPlaying)
+                {
+                    _audioSource.Play();
+                }
                 if (_x != 0 || _y != 0)
                 {
                     _tmpx = _x;
                     _tmpy = _y;
+
                     _isWalk = true;
                 }
                 else
                 {
                     _isWalk = false;
+                    if (_audioSource.isPlaying) { _audioSource.Stop(); }
                 }
 
-                if (Input.GetButtonDown("Fire1"))
+                if (DreamStateScripts.DreamState == DreamState.Normal)
                 {
-                    Bomb();
-                }// 時限爆弾
+                    if (Input.GetButtonDown("Fire1") && _bomItem.IsBom)
+                    {
+                        Bomb();
+                    }// 時限爆弾
 
-                if (Input.GetButtonDown("Fire2"))
-                {
-                    StartCoroutine(StunGun());
-                }// クラッカー
+                    if (Input.GetButtonDown("Fire2") && _crakerItem.IsCraker)
+                    {
+                        StartCoroutine(StunGun());
+                    }// クラッカー
 
-                if (Input.GetButtonDown("Fire3"))
-                {
-                    BoarSpeedUp();
-                }// イノシシスピアップ
+                    if (Input.GetButtonDown("Fire3") && _boarInterval.BoarUseBool)
+                    {
+                        BoarSpeedUp();
+                    }// イノシシスピアップ
 
-                if (Input.GetButtonDown("Skill"))
-                {
-                    DreamStateScripts.DreamWorld.Invoke();
-                }// 夢世界
+                    if (Input.GetButtonDown("Skill") && DreamStateScripts.IsCountTimer)
+                    {
+                        DreamStateScripts.DreamWorld.Invoke();
+                    }// 夢世界
+                }
 
             }
         }
@@ -94,9 +106,9 @@ public class PlayerController : MonoBehaviour
                 _rb.velocity = horizontal.normalized * _dreamSpeed + vertical.normalized * _dreamSpeed;
             }
             DirectionTarget();
-            _anim.SetFloat("x",_tmpx);
-            _anim.SetFloat("y",_tmpy);
-            _anim.SetBool("walk",_isWalk);
+            _anim.SetFloat("x", _tmpx);
+            _anim.SetFloat("y", _tmpy);
+            _anim.SetBool("walk", _isWalk);
         }
         else
         {
@@ -140,16 +152,19 @@ public class PlayerController : MonoBehaviour
     /// <summary>イノシシモードになるときに呼ばれるメソッド</summary>
     void BoarSpeedUp()
     {
+
         _bearBool = true;
+        _audioSource.Play();
         _x = _tmpx;
         _y = _tmpy;
         Debug.Log("Boar");
+        _boarInterval.UseBoar();
     }
 
     IEnumerator StunGun()
     {
         _actionBool = true;
-        _anim.SetBool("Action",_actionBool);
+        _anim.SetBool("Action", _actionBool);
         yield return StartCoroutine(_crakerItem.Action());
         _actionBool = false;
         _anim.SetBool("Action", _actionBool);
@@ -162,16 +177,9 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Respawn")
+        if (collision.TryGetComponent<Jewel>(out var jewel))
         {
-            if (DreamStateScripts.DreamState == DreamState.Dream)
-            {
-                Debug.Log("ひかりあれ！");
-            }
-            else
-            {
-                Debug.Log("Getだぜ！");
-            }
+            jewel.JewelFound();            
         }
     }
 
@@ -185,6 +193,8 @@ public class PlayerController : MonoBehaviour
                 stun.ChangeStunState();
             }
             _bearBool = false;
+            _boarInterval.ResetBoar();
+            _audioSource.Stop();
             Debug.Log("SpeedNormal");
         }
     }
