@@ -13,6 +13,9 @@ public class CrackerItem : MonoBehaviour
     [SerializeField, Header("横のあたり判定")] float _boxHorizontal = 5f;
     [SerializeField, Header("縦のあたり判定")] float _boxVertical = 5f;
     [SerializeField, Header("クラッカーをインスタンスする位置")] Transform _crackerPos;
+    [SerializeField, Header("オーディオソースの設定")] AudioSource _audioSource;
+    [SerializeField, Header("出したい音")] AudioClip _audioClip;
+
     private void Start()
     {
         _timer = _interval;
@@ -23,6 +26,11 @@ public class CrackerItem : MonoBehaviour
         //インターバルよりもタイマーが小さい場合に出す。
         if (!(_timer >= _interval))
             _timer += Time.deltaTime;
+        //タイマーがインターバルよりも大きい場合
+        if (_timer > _interval)
+        {
+            _timer = _interval;
+        }
         //UIのスライダーに表示する
         UiKousin();
     }
@@ -35,6 +43,8 @@ public class CrackerItem : MonoBehaviour
     {
         if (_timer >= _interval)
         {
+            //音を出す
+            _audioSource.PlayOneShot(_audioClip);
             //クラッカーの処理を書く
             // 指定範囲のコライダーを全て取得する
             var cols = Physics2D.OverlapBoxAll(_centerShotPos.transform.position, new Vector2(_boxHorizontal, _boxVertical), _centerShotPos.transform.rotation.z);
