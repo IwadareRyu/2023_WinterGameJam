@@ -7,8 +7,8 @@ public class GManager : MonoBehaviour
     //-------Var-------//
 
     [Header("累計プレイ時間（減算方式）")] public float initialTimer = 300.0f;
-    [Header("経過時間（加算方式）")] public Text elapsedTimeText;
     [Header("残り時間表示テキスト")] public Text timerText;
+    [Header("経過時間表示テキスト")] public Text elapsedTimeText;
     [Header("敵と衝突時の残り時間スピードアップ速度")] public float speedUpSpeed = 10.0f;
     [Header("タイムスコア（１秒につき何点乗算するか）")] public float TimeScore = 100.0f;
     [Header("ジュエルスコア（１つにつき何点乗算するか）")] public int jewelScore = 10000;
