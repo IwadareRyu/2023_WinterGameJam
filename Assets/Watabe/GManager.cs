@@ -48,6 +48,7 @@ public class GManager : MonoBehaviour
     private void Start()
     {
         ResetTimer();
+        jewelCount = 0;
     }
 
     void Update()
