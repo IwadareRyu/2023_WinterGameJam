@@ -8,7 +8,9 @@ public class Jewel : MonoBehaviour
 {
     [SerializeField] bool IsDream = false;
     [SerializeField] bool IsFound = false;
-    
+    [SerializeField, Header("オーディオソースの設定")] AudioSource _audioSource;
+    [SerializeField, Header("出したい音")] AudioClip _audioClip;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +40,9 @@ public class Jewel : MonoBehaviour
         else
         {
             //ゲームマネージャーのジュエルスコアを更新してデストロイする
-            Debug.Log("ジュエルを取った");
+            GManager.Instance.AddJewelCount();
+            //音を出す
+            _audioSource.PlayOneShot(_audioClip);
             Destroy(this.gameObject);
         }
 
