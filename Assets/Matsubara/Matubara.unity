@@ -1074,6 +1074,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 820308829}
     - target: {fileID: 8684433319117935969, guid: 295c4a5595292164fa10a7338d4bcf96, type: 3}
+      propertyPath: _isPatrollingGuard
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8684433319117935969, guid: 295c4a5595292164fa10a7338d4bcf96, type: 3}
+      propertyPath: _targetPoss.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8684433319117935969, guid: 295c4a5595292164fa10a7338d4bcf96, type: 3}
       propertyPath: _targetPoss.Array.data[0]
       value: 
       objectReference: {fileID: 610591355}

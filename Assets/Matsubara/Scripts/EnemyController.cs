@@ -51,6 +51,8 @@ public class EnemyController : MonoBehaviour
 
         if (_isPatrollingGuard) _nowCoroutine = StartCoroutine(Patrol());
         else _nowCoroutine = StartCoroutine(Search());
+
+        StartCoroutine(DrawRay());
     }
 
     IEnumerator DrawRay()
