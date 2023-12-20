@@ -29,7 +29,7 @@ public class Bom : MonoBehaviour
             if(c.TryGetComponent<StunStateScripts>(out var stunState))
             {
                 //”š”­‚ÌƒLƒƒƒ‰‚Ìˆ—
-
+                stunState.ExplosionScale();
                 //ƒXƒ^ƒ“‚³‚¹‚é
                 stunState.ChangeStunState();
             }
