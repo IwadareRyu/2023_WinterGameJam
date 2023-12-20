@@ -8,6 +8,7 @@ public class TitleTransition : MonoBehaviour
     //æ“ª‚ÌƒV[ƒ“‚É‘JˆÚ‚·‚é
     public void TitleScene()
     {
+        GManager.Instance.ResetGame();
         SceneManager.LoadScene(0);
     }
 }
