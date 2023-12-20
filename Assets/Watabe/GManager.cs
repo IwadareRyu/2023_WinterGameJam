@@ -9,6 +9,7 @@ public class GManager : MonoBehaviour
     [Header("累計プレイ時間（減算方式）")] public float initialTimer = 300.0f;
     [Header("残り時間表示テキスト")] public Text timerText;
     [Header("経過時間表示テキスト")] public Text elapsedTimeText;
+    [Header("スコア表示テキスト")]public Text scoreText;
     [Header("敵と衝突時の残り時間スピードアップ速度")] public float speedUpSpeed = 10.0f;
     [Header("タイムスコア（１秒につき何点乗算するか）")] public float TimeScore = 100.0f;
     [Header("ジュエルスコア（１つにつき何点乗算するか）")] public int jewelScore = 10000;
@@ -139,15 +140,6 @@ public class GManager : MonoBehaviour
         return score;
     }
 
-    //------Goal-----//
-
-    // ゴールした時に呼ぶ
-    public void Goal()
-    {
-        CalculateScore();
-        SceneManager.LoadScene(resultSceneName);
-    }
-
     //------Time------//
 
     public void ResetTimer()
@@ -198,5 +190,25 @@ public class GManager : MonoBehaviour
     public float GetBGMVolume()
     {
         return bgmSource != null ? bgmSource.volume : 0;
+    }
+
+    //------Goal-----//
+
+    // ゴールした時に呼ぶ
+    public void Goal()
+    {
+        CalculateScore();
+        SceneManager.LoadScene(resultSceneName);
+    }
+
+    //------Reset-----//
+    
+    // スタート画面にて呼ぶ
+    public void ResetGame()
+    {
+        ResetTimer();
+        jewelCount = 0;
+        elapsedTime = 0;
+        score = 0;
     }
 }
