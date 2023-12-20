@@ -40,7 +40,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5311953154563387414}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -137,6 +137,9 @@ PolygonCollider2D:
       - {x: -0.355, y: -0.125}
       - {x: -0.21499999, y: -0.21499999}
       - {x: -0.145, y: -0.235}
+      - {x: -0.08479204, y: -0.2452952}
+      - {x: 0.00566213, y: -0.2479176}
+      - {x: 0.09823465, y: -0.24661033}
       - {x: 0.175, y: -0.235}
       - {x: 0.355, y: -0.13499999}
       - {x: 0.435, y: -0.035}
@@ -244,15 +247,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPoss: []
-  _isPatrollingGuard: 1
+  _isPatrollingGuard: 0
   _wallLayer:
     serializedVersion: 2
     m_Bits: 0
   _playerSpawnPos: {fileID: 0}
   _walkSpeed: 5
-  _sprintSpeed: 5
-  _stopDistance: 0.5
+  _sprintSpeed: 7
   _stunState: {fileID: 8699855314555765422}
+  _stopDistance: 0.5
+  _returnTime: 2
 --- !u!114 &8699855314555765422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,7 +296,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &1685076062602172013
 BoxCollider2D:
   m_ObjectHideFlags: 0
