@@ -10,19 +10,24 @@ public class BomItem : MonoBehaviour
     public float _uiPercent;
     [SerializeField] GameObject _bomPrefab;
     Transform _playerPos;
+    bool _isBom;
+    public bool IsBom => _isBom;
+
     private void Start()
     {
         _timer = _interval;
+        _isBom = true;
     }
 
     void Update()
     {
         //インターバルよりもタイマーが小さい場合に出す。
-        if (!(_timer >= _interval))
+        if (!_isBom)
             _timer += Time.deltaTime;
         //タイマーがインターバルよりも大きい場合
-        if (_timer > _interval)
+        if (_timer >= _interval && !_isBom)
         {
+            _isBom = true;
             _timer = _interval;
         }
         //UIのスライダーに表示する
