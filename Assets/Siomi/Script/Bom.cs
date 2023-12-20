@@ -8,7 +8,8 @@ public class Bom : MonoBehaviour
     [SerializeField, Header("爆発までの時間")] float _bomInterval = 5f;
     [SerializeField, Header("爆発エフェクト")] GameObject _bomEffect;
     [SerializeField, Header("爆発範囲")] float _bomRange = 5.0f;
-
+    [SerializeField, Header("オーディオソースの設定")] AudioSource _audioSource;
+    [SerializeField, Header("出したい音")] AudioClip _audioClip;
     private void Start()
     {
         Invoke("Expllosion", _bomInterval);
@@ -16,6 +17,9 @@ public class Bom : MonoBehaviour
 
     void Expllosion()
     {
+        //音を出す
+        _audioSource.PlayOneShot(_audioClip);
+
         // 指定範囲のコライダーを全て取得する
         var cols = Physics2D.OverlapCircleAll(this.transform.position, _bomRange);
 
@@ -24,6 +28,8 @@ public class Bom : MonoBehaviour
         {
             if(c.TryGetComponent<StunStateScripts>(out var stunState))
             {
+                //爆発時のキャラの処理
+
                 //スタンさせる
                 stunState.ChangeStunState();
             }
