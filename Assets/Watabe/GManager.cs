@@ -46,12 +46,6 @@ public class GManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        ResetTimer();
-        jewelCount = 0;
-    }
-
     void Update()
     {
         if (SceneManager.GetActiveScene().name == mainSceneName)
@@ -87,11 +81,11 @@ public class GManager : MonoBehaviour
             // 経過時間の更新
             if (isSpeedUp)
             {
-                elapsedTime += Time.deltaTime * speedUpSpeed;
+                elapsedTime += deltaTime * speedUpSpeed;
             }
             else
             { 
-                elapsedTime += Time.deltaTime;
+                elapsedTime += deltaTime;
             }
 
             if (elapsedTimeText != null)
@@ -132,6 +126,12 @@ public class GManager : MonoBehaviour
         {
             score = 0;
         }
+    }
+
+    // スコアの表示（リザルト画面で呼ぶ）
+    public void ShowScore()
+    {
+        scoreText.text = "Score: " + score.ToString();
     }
 
     // スコアの取得
