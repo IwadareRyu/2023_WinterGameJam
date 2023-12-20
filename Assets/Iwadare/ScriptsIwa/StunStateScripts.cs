@@ -1,6 +1,4 @@
 using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StunStateScripts : MonoBehaviour
@@ -9,11 +7,13 @@ public class StunStateScripts : MonoBehaviour
     public StunState StunState => _stunState;
     [SerializeField] float _stunTime = 5f;
     float _time;
+    Animator _anim;
 
     // Start is called before the first frame update
     private void Awake()
     {
         _stunState = StunState.Normal;
+        _anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -27,6 +27,7 @@ public class StunStateScripts : MonoBehaviour
         {
             Debug.Log("Normal");
             _time = 0f;
+            if (_anim != null) { _anim.Play("Idle"); }
             _stunState = StunState.Normal;
         }
     }
@@ -38,8 +39,8 @@ public class StunStateScripts : MonoBehaviour
         var expSeq = DOTween.Sequence();
         expSeq.Append(transform.DOScale(tmpScale * 3f, _stunTime / 2f / 4f))
             .Append(transform.DOScale(tmpScale, _stunTime / 2f / 2f))
-            .Append(transform.DOScale(tmpScale * 1.5f,_stunTime / 2f / 8f))
-            .Append(transform.DOScale(tmpScale,_stunTime / 2f / 8f));
+            .Append(transform.DOScale(tmpScale * 1.5f, _stunTime / 2f / 8f))
+            .Append(transform.DOScale(tmpScale, _stunTime / 2f / 8f));
         expSeq.Play().SetLink(gameObject);
     }
 
@@ -48,6 +49,10 @@ public class StunStateScripts : MonoBehaviour
     {
         Debug.Log("Stun");
         _stunState = StunState.Stun;
+        if (_anim != null)
+        {
+            _anim.Play("Stun");
+        }
     }
 
 }

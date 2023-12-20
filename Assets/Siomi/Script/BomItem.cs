@@ -33,7 +33,7 @@ public class BomItem : MonoBehaviour
     {
         _uiPercent = _timer / _interval;
     }
-    void Action()
+    public void Action()
     {
         if (_timer >= _interval)
         {

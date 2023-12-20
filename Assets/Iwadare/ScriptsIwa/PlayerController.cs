@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -10,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform _cracerInsPos;
     [SerializeField] Cracker _crakerPrefab;
     [SerializeField] CrackerItem _crakerItem;
+    [SerializeField] BomItem _bomItem;
     Animator _anim;
     bool _isWalk;
     bool _bearBool;
@@ -50,12 +53,12 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetButtonDown("Fire1"))
                 {
-
+                    Bomb();
                 }// 時限爆弾
 
                 if (Input.GetButtonDown("Fire2"))
                 {
-                    StunGun();
+                    StartCoroutine(StunGun());
                 }// クラッカー
 
                 if (Input.GetButtonDown("Fire3"))
@@ -74,7 +77,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_stunStateScripts.StunState != StunState.Stun)
+        if (_stunStateScripts.StunState != StunState.Stun && !_actionBool)
         {
             //移動処理
             var horizontal = Vector2.right * _x;
@@ -130,6 +133,11 @@ public class PlayerController : MonoBehaviour
         _rotaObj.eulerAngles = rota;
     }
 
+    void Bomb()
+    {
+        _bomItem.Action();
+    }
+
     /// <summary>イノシシモードになるときに呼ばれるメソッド</summary>
     void BoarSpeedUp()
     {
@@ -139,9 +147,13 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Boar");
     }
 
-    void StunGun()
+    IEnumerator StunGun()
     {
-        StartCoroutine(_crakerItem.Action());
+        _actionBool = true;
+        _anim.SetBool("Action",_actionBool);
+        yield return StartCoroutine(_crakerItem.Action());
+        _actionBool = false;
+        _anim.SetBool("Action", _actionBool);
     }
 
     /// <summary>Stunするときに呼び出されるメソッド</summary>
