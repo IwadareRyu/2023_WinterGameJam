@@ -16,20 +16,24 @@ public class CrackerItem : MonoBehaviour
     [SerializeField, Header("オーディオソースの設定")] AudioSource _audioSource;
     [SerializeField, Header("出したい音")] AudioClip _audioClip;
     [SerializeField] float _attackDelayTime = 1f;
+    bool _isCraker;
+    public bool IsCraker => _isCraker;
 
     private void Start()
     {
         _timer = _interval;
+        _isCraker = true;
     }
 
     void Update()
     {
         //インターバルよりもタイマーが小さい場合に出す。
-        if (!(_timer >= _interval))
+        if (!_isCraker)
             _timer += Time.deltaTime;
         //タイマーがインターバルよりも大きい場合
-        if (_timer > _interval)
+        if (_timer >= _interval && !_isCraker)
         {
+            _isCraker = true;
             _timer = _interval;
         }
         //UIのスライダーに表示する
