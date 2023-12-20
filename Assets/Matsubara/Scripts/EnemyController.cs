@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -56,6 +57,8 @@ public class EnemyController : MonoBehaviour
     private bool _isStun = false;
     Rigidbody2D _rb;
     private Vector2 _defaultPos = default;
+    private Quaternion _defaultQua = Quaternion.identity;
+    private Quaternion _defaultFOVQua = Quaternion.identity;
     private Transform _playerPos = null;
     private Coroutine _nowCoroutine;
     private bool _isTimerEnd = false;
@@ -68,6 +71,8 @@ public class EnemyController : MonoBehaviour
         if (TryGetComponent(out Rigidbody2D rb)) _rb = rb;
 
         _defaultPos = transform.position;
+        _defaultQua = transform.rotation;
+        _defaultFOVQua = _fov.rotation;
         _exclamationMark.SetActive(false);
     }
 
@@ -139,6 +144,8 @@ public class EnemyController : MonoBehaviour
             // プレイヤーを追跡する方向を計算して移動
             var dir = (_playerPos.position - this.transform.position).normalized;
             _fov.transform.up = dir * -1;
+            _animator.SetFloat("x", dir.x);
+            _animator.SetFloat("y", dir.y);
             _rb.velocity = dir * _sprintSpeed;
             yield return new WaitForFixedUpdate();
         }
@@ -182,6 +189,8 @@ public class EnemyController : MonoBehaviour
 
             _walkSE.Stop();
             this.transform.position = _defaultPos;
+            this.transform.rotation = _defaultQua;
+            _fov.rotation = _defaultFOVQua;
             yield break;
         }
     }
@@ -238,6 +247,7 @@ public class EnemyController : MonoBehaviour
         {
             StopCoroutine(_nowCoroutine);
             _nowCoroutine = StartCoroutine(Return());
+            _exclamationMark.SetActive(false);
         }
     }
 
