@@ -15,6 +15,7 @@ public class CrackerItem : MonoBehaviour
     [SerializeField, Header("クラッカーをインスタンスする位置")] Transform _crackerPos;
     [SerializeField, Header("オーディオソースの設定")] AudioSource _audioSource;
     [SerializeField, Header("出したい音")] AudioClip _audioClip;
+    [SerializeField] float _attackDelayTime = 1f;
 
     private void Start()
     {
@@ -39,8 +40,9 @@ public class CrackerItem : MonoBehaviour
     {
         _uiPercent = _timer / _interval;
     }
-    public void Action()
+    public IEnumerator Action()
     {
+        yield return new WaitForSeconds(_attackDelayTime);
         if (_timer >= _interval)
         {
             //音を出す

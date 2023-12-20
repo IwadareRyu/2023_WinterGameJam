@@ -141,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
     void StunGun()
     {
-        _crakerItem.Action();
+        StartCoroutine(_crakerItem.Action());
     }
 
     /// <summary>Stunするときに呼び出されるメソッド</summary>
