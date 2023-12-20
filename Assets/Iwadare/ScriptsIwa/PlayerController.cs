@@ -6,9 +6,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _speed = 3f;
     [SerializeField] float _boarSpeed = 5f;
     [SerializeField] float _dreamSpeed = 4f;
-    BoarState _speedState = BoarState.Human;
-
-
+    [SerializeField] Transform _rotaObj;
+    [SerializeField] Transform _cracerInsPos;
+    [SerializeField] Cracker _crakerPrefab;
+    [SerializeField] CrackerItem _crakerItem;
+    Animator _anim;
+    bool _isWalk;
+    bool _bearBool;
+    bool _actionBool;
     Rigidbody2D _rb;
     float _x, _y;
     float _tmpx, _tmpy;
@@ -16,6 +21,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<Animator>();
         _tmpy = 1;
     }
 
@@ -25,7 +31,7 @@ public class PlayerController : MonoBehaviour
         if (_stunStateScripts.StunState == StunState.Normal)
         {
 
-            if (_speedState == BoarState.Human)
+            if (!_bearBool && !_actionBool)
             {
                 //移動
                 _x = Input.GetAxisRaw("Horizontal");
@@ -35,6 +41,11 @@ public class PlayerController : MonoBehaviour
                 {
                     _tmpx = _x;
                     _tmpy = _y;
+                    _isWalk = true;
+                }
+                else
+                {
+                    _isWalk = false;
                 }
 
                 if (Input.GetButtonDown("Fire1"))
@@ -44,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetButtonDown("Fire2"))
                 {
-
+                    StunGun();
                 }// クラッカー
 
                 if (Input.GetButtonDown("Fire3"))
@@ -68,11 +79,11 @@ public class PlayerController : MonoBehaviour
             //移動処理
             var horizontal = Vector2.right * _x;
             var vertical = Vector2.up * _y;
-            if (_speedState == BoarState.Human && DreamStateScripts.DreamState == DreamState.Normal)
+            if (!_bearBool && DreamStateScripts.DreamState == DreamState.Normal)
             {
                 _rb.velocity = horizontal.normalized * _speed + vertical.normalized * _speed;
             }
-            else if (_speedState == BoarState.Boar)
+            else if (_bearBool)
             {
                 _rb.velocity = horizontal.normalized * _boarSpeed + vertical.normalized * _boarSpeed;
             }
@@ -80,6 +91,10 @@ public class PlayerController : MonoBehaviour
             {
                 _rb.velocity = horizontal.normalized * _dreamSpeed + vertical.normalized * _dreamSpeed;
             }
+            DirectionTarget();
+            _anim.SetFloat("x",_tmpx);
+            _anim.SetFloat("y",_tmpy);
+            _anim.SetBool("walk",_isWalk);
         }
         else
         {
@@ -87,13 +102,46 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void DirectionTarget()
+    {
+        var rota = _rotaObj.eulerAngles;
+        if (_tmpx != 0)
+        {
+            if (_tmpx > 0)
+            {
+                rota.z = 0f;
+            }
+            else
+            {
+                rota.z = 180f;
+            }
+        }
+        else
+        {
+            if (_tmpy > 0)
+            {
+                rota.z = 90f;
+            }
+            else
+            {
+                rota.z = 270f;
+            }
+        }
+        _rotaObj.eulerAngles = rota;
+    }
+
     /// <summary>イノシシモードになるときに呼ばれるメソッド</summary>
     void BoarSpeedUp()
     {
-        _speedState = BoarState.Boar;
+        _bearBool = true;
         _x = _tmpx;
         _y = _tmpy;
         Debug.Log("Boar");
+    }
+
+    void StunGun()
+    {
+        _crakerItem.Action();
     }
 
     /// <summary>Stunするときに呼び出されるメソッド</summary>
@@ -118,23 +166,16 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (_speedState == BoarState.Boar)
+        if (_bearBool)
         {
             Stun();
             if (collision.gameObject.TryGetComponent<StunStateScripts>(out var stun))
             {
                 stun.ChangeStunState();
             }
-            _speedState = BoarState.Human;
+            _bearBool = false;
             Debug.Log("SpeedNormal");
         }
-    }
-
-    /// <summary>イノシシモードか否か</summary>
-    enum BoarState
-    {
-        Human,
-        Boar,
     }
 
 }

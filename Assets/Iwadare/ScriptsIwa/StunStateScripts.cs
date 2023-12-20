@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,6 +29,18 @@ public class StunStateScripts : MonoBehaviour
             _time = 0f;
             _stunState = StunState.Normal;
         }
+    }
+
+    public void ExplosionScale()
+    {
+        Debug.Log("ドカーン！");
+        var tmpScale = transform.localScale;
+        var expSeq = DOTween.Sequence();
+        expSeq.Append(transform.DOScale(tmpScale * 3f, _stunTime / 2f / 4f))
+            .Append(transform.DOScale(tmpScale, _stunTime / 2f / 2f))
+            .Append(transform.DOScale(tmpScale * 1.5f,_stunTime / 2f / 8f))
+            .Append(transform.DOScale(tmpScale,_stunTime / 2f / 8f));
+        expSeq.Play().SetLink(gameObject);
     }
 
     /// <summary>Stun状態切り替え</summary>
