@@ -7,7 +7,7 @@ public class BomItem : MonoBehaviour
     [SerializeField, Header("アイテムの使用インターバル")] float _interval;
     float _timer;
     /// <summary> UI用のアイテムインターバルの割合 </summary>
-    float _uiPercent;
+    public float _uiPercent;
     [SerializeField] GameObject _bomPrefab;
     Transform _playerPos;
     private void Start()
@@ -20,6 +20,11 @@ public class BomItem : MonoBehaviour
         //インターバルよりもタイマーが小さい場合に出す。
         if (!(_timer >= _interval))
             _timer += Time.deltaTime;
+        //タイマーがインターバルよりも大きい場合
+        if (_timer > _interval)
+        {
+            _timer = _interval;
+        }
         //UIのスライダーに表示する
         UiKousin();
     }
